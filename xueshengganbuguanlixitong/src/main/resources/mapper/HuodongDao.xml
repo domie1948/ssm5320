@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.HuodongDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.ganbu_id as ganbuId
+        ,a.huodong_name as huodongName
+        ,a.huodong_uuid_number as huodongUuidNumber
+        ,a.huodong_photo as huodongPhoto
+        ,a.huodong_types as huodongTypes
+        ,a.huodong_kucun_number as huodongKucunNumber
+        ,a.huodong_clicknum as huodongClicknum
+        ,a.huodong_content as huodongContent
+        ,a.shangxia_types as shangxiaTypes
+        ,a.huodong_delete as huodongDelete
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.HuodongView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,ganbu.ganbu_name as ganbuName
+        ,ganbu.ganbu_phone as ganbuPhone
+        ,ganbu.ganbu_id_number as ganbuIdNumber
+        ,ganbu.ganbu_photo as ganbuPhoto
+        ,ganbu.banji_types as banjiTypes
+        ,ganbu.zhiwei_types as zhiweiTypes
+        ,ganbu.ganbu_email as ganbuEmail
+
+        FROM huodong  a
+        left JOIN ganbu ganbu ON a.ganbu_id = ganbu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.ganbuId != null and params.ganbuId != ''">
+                and (
+                    a.ganbu_id = #{params.ganbuId}
+                )
+            </if>
+            <if test=" params.huodongName != '' and params.huodongName != null and params.huodongName != 'null' ">
+                and a.huodong_name like CONCAT('%',#{params.huodongName},'%')
+            </if>
+            <if test=" params.huodongUuidNumber != '' and params.huodongUuidNumber != null and params.huodongUuidNumber != 'null' ">
+                and a.huodong_uuid_number like CONCAT('%',#{params.huodongUuidNumber},'%')
+            </if>
+            <if test="params.huodongTypes != null and params.huodongTypes != ''">
+                and a.huodong_types = #{params.huodongTypes}
+            </if>
+            <if test="params.huodongKucunNumberStart != null and params.huodongKucunNumberStart != ''">
+                <![CDATA[  and a.huodong_kucun_number >= #{params.huodongKucunNumberStart}   ]]>
+            </if>
+            <if test="params.huodongKucunNumberEnd != null and params.huodongKucunNumberEnd != ''">
+                <![CDATA[  and a.huodong_kucun_number <= #{params.huodongKucunNumberEnd}   ]]>
+            </if>
+             <if test="params.huodongKucunNumber != null and params.huodongKucunNumber != ''">
+                and a.huodong_kucun_number = #{params.huodongKucunNumber}
+             </if>
+            <if test="params.huodongClicknumStart != null and params.huodongClicknumStart != ''">
+                <![CDATA[  and a.huodong_clicknum >= #{params.huodongClicknumStart}   ]]>
+            </if>
+            <if test="params.huodongClicknumEnd != null and params.huodongClicknumEnd != ''">
+                <![CDATA[  and a.huodong_clicknum <= #{params.huodongClicknumEnd}   ]]>
+            </if>
+             <if test="params.huodongClicknum != null and params.huodongClicknum != ''">
+                and a.huodong_clicknum = #{params.huodongClicknum}
+             </if>
+            <if test=" params.huodongContent != '' and params.huodongContent != null and params.huodongContent != 'null' ">
+                and a.huodong_content like CONCAT('%',#{params.huodongContent},'%')
+            </if>
+            <if test="params.shangxiaTypes != null and params.shangxiaTypes != ''">
+                and a.shangxia_types = #{params.shangxiaTypes}
+            </if>
+            <if test="params.huodongDeleteStart != null and params.huodongDeleteStart != ''">
+                <![CDATA[  and a.huodong_delete >= #{params.huodongDeleteStart}   ]]>
+            </if>
+            <if test="params.huodongDeleteEnd != null and params.huodongDeleteEnd != ''">
+                <![CDATA[  and a.huodong_delete <= #{params.huodongDeleteEnd}   ]]>
+            </if>
+             <if test="params.huodongDelete != null and params.huodongDelete != ''">
+                and a.huodong_delete = #{params.huodongDelete}
+             </if>
+
+                <!-- 判断干部的id不为空 -->
+            <if test=" params.ganbuIdNotNull != '' and params.ganbuIdNotNull != null and params.ganbuIdNotNull != 'null' ">
+                and a.ganbu_id IS NOT NULL
+            </if>
+            <if test=" params.ganbuName != '' and params.ganbuName != null and params.ganbuName != 'null' ">
+                and ganbu.ganbu_name like CONCAT('%',#{params.ganbuName},'%')
+            </if>
+            <if test=" params.ganbuPhone != '' and params.ganbuPhone != null and params.ganbuPhone != 'null' ">
+                and ganbu.ganbu_phone like CONCAT('%',#{params.ganbuPhone},'%')
+            </if>
+            <if test=" params.ganbuIdNumber != '' and params.ganbuIdNumber != null and params.ganbuIdNumber != 'null' ">
+                and ganbu.ganbu_id_number like CONCAT('%',#{params.ganbuIdNumber},'%')
+            </if>
+            <if test="params.banjiTypes != null  and params.banjiTypes != ''">
+                and ganbu.banji_types = #{params.banjiTypes}
+            </if>
+
+            <if test="params.zhiweiTypes != null  and params.zhiweiTypes != ''">
+                and ganbu.zhiwei_types = #{params.zhiweiTypes}
+            </if>
+
+            <if test=" params.ganbuEmail != '' and params.ganbuEmail != null and params.ganbuEmail != 'null' ">
+                and ganbu.ganbu_email like CONCAT('%',#{params.ganbuEmail},'%')
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
